@@ -1,0 +1,24 @@
+# Editor files
+*.swp
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Local environment
+.env
+.env.local
+
+# SSH keys (just in case)
+*.pem
+id_rsa
+id_rsa.pub
+
+# Wiki database files (if using file-based wiki)
+wiki/data/
+wiki/cache/
+
+# Backup files
+*.backup
+*.bak
