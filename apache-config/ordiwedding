@@ -15,12 +15,19 @@
     ProxyRequests Off
     ProxyPreserveHost Off
     
+    # Apache 2.2 requires explicit proxy permissions
+    <Proxy *>
+        Order allow,deny
+        Allow from all
+    </Proxy>
+    
     # Wiki paths served locally (not proxied)
     ProxyPass /wiki !
     # TODO: Uncomment when wiki is installed
     # Alias /wiki /home/anthony/repos/ordiwedding/wiki
     # <Directory /home/anthony/repos/ordiwedding/wiki>
-    #     Require all granted
+    #     Order allow,deny
+    #     Allow from all
     # </Directory>
     
     # Proxy all other paths to Canva

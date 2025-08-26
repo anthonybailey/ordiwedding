@@ -252,6 +252,32 @@ Per screenshots, includes:
 6. **No authentication complexity** - Keep it simple
 7. **Expect iteration** - This is a living document
 
+## Implementation Status (August 26, 2025)
+
+### Completed
+- GitHub repo created: https://github.com/anthonybailey/ordiwedding
+- Apache config deployed to monkeys server (Ubuntu 8.04, Apache 2.2)
+- Deployment script created with `sumo` integration
+- Local hosts file configured for testing
+- DNS verified (both domains point to parking page, need update at Name.com)
+
+### Tools Created
+- `sumo` - Remote sudo wrapper for monkeys server (in ~/repos/main/bin/, committed to SVN)
+  - Checks sudo cache to avoid unnecessary password prompts
+  - Opens terminal for password entry when needed
+  - Usage: `sumo "command"` or `sumo 'bash -c "complex && commands"'`
+
+### Current Issues
+- Apache proxy returning 500 error - needs SSL module for HTTPS backend
+- Apache 2.2 limitations with proxying to HTTPS sites
+- Name.com is in maintenance (as of late Aug 25, 2025)
+
+### Next Steps
+1. Install/configure SSL module for Apache
+2. Update DNS when Name.com is available
+3. Test proxy with production Canva URL
+4. Select and install wiki software
+
 ## Success Metrics
 
 - Julie can update homepage without technical help (100% requirement)
