@@ -1,43 +1,41 @@
 # Apache config for Julie & Anthony's wedding website
 # Handles both ordi.wedding and ordiwedd.ing domains
-# Deploy to: /etc/apache2/sites-available/ordiwedding.conf
+# Traffic comes via Cloudflare (HTTPS termination handled there)
+# Cloudflare Worker routes /-/* paths here, everything else to Canva
 
 <VirtualHost *:80>
     # Both domains serve the same content
     ServerName ordi.wedding
     ServerAlias www.ordi.wedding ordiwedd.ing www.ordiwedd.ing
-    
+
     # Logging (both domains share logs)
     ErrorLog /var/log/apache2/ordiwedding-error.log
     CustomLog /var/log/apache2/ordiwedding-access.log combined
-    
-    # Reverse proxy configuration
-    ProxyRequests Off
-    ProxyPreserveHost Off
-    
-    # Apache 2.2 requires explicit proxy permissions
-    <Proxy *>
+
+    # Document root
+    DocumentRoot /var/www/ordiwedding
+
+    # Content pages under /-/ (unobtrusive URL convention)
+    Alias /- /var/www/ordiwedding/-
+    <Directory /var/www/ordiwedding/->
         Order allow,deny
         Allow from all
-    </Proxy>
-    
-    # Wiki paths served locally (not proxied)
-    ProxyPass /wiki !
-    # TODO: Uncomment when wiki is installed
-    # Alias /wiki /home/anthony/repos/ordiwedding/wiki
-    # <Directory /home/anthony/repos/ordiwedding/wiki>
-    #     Order allow,deny
-    #     Allow from all
-    # </Directory>
-    
-    # Proxy all other paths to Canva
-    ProxyPass / https://ordiwedding-preview.my.canva.site/
-    ProxyPassReverse / https://ordiwedding-preview.my.canva.site/
-    
-    # Headers for JavaScript functionality  
+        Options Indexes FollowSymLinks Includes MultiViews
+        DirectoryIndex index.html
+        # Process SSI in .html files (for shared nav)
+        AddOutputFilter INCLUDES .html
+    </Directory>
+
+    # Root directory (shouldn't be reached due to Worker, but just in case)
+    <Directory /var/www/ordiwedding>
+        Order allow,deny
+        Allow from all
+        Options Indexes FollowSymLinks
+    </Directory>
+
+    # Headers for Cloudflare compatibility
     Header always set Access-Control-Allow-Origin "*"
-    RequestHeader set X-Forwarded-Proto "http"
 </VirtualHost>
 
-# TODO: Add SSL VirtualHost for port 443 once Let's Encrypt is configured
-# Note: ordiwedd.ing requires HTTPS due to HSTS preloading
+# Note: SSL/HTTPS is handled by Cloudflare, not needed here
+# Worker routes /-/* traffic here, everything else to Canva

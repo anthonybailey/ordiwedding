@@ -1,6 +1,9 @@
 #!/bin/bash
 # Deploy Apache configuration to server
 # Run from project root: ./deploy/deploy-apache-config.sh
+#
+# NOTE: This script uses sumo (sudo wrapper) which opens a terminal
+# popup for password entry. Must be run from a LOCAL terminal, not SSH.
 
 set -e  # Exit on any error
 
