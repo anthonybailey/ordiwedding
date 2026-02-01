@@ -26,6 +26,12 @@
         AddOutputFilter INCLUDES .html
     </Directory>
 
+    # CGI scripts for form handling (RSVP etc)
+    <Directory /var/www/ordiwedding/-/cgi>
+        Options +ExecCGI
+        AddHandler cgi-script .pl
+    </Directory>
+
     # Root directory (shouldn't be reached due to Worker, but just in case)
     <Directory /var/www/ordiwedding>
         Order allow,deny

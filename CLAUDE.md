@@ -39,7 +39,7 @@ SSL is terminated by Cloudflare (Flexible mode — connects to monkeys via HTTP)
 - **IP:** 173.45.225.190, port 30022
 - **OS:** Ubuntu 8.04 (ancient but functional)
 - **Apache:** 2.2.8 with mod_include (SSI) and MultiViews enabled
-- **Perl:** Available (for future CGI forms)
+- **Perl:** 5.8.8, CGI module 3.15 (used for RSVP form)
 - **PHP:** Not installed
 - **Python:** 2.5.2 only
 - **SSH:** Only offers ssh-rsa/ssh-dss (modern clients need `HostKeyAlgorithms +ssh-rsa`)
@@ -50,10 +50,11 @@ Located in `apache-config/ordiwedding`. Key features:
 - Alias `/-` to `/var/www/ordiwedding/-`
 - SSI enabled (`AddOutputFilter INCLUDES .html`) for shared nav
 - MultiViews enabled (extensionless URLs: `/-/travel` serves `travel.html`)
+- CGI enabled in `/-/cgi` subdirectory (`.pl` scripts)
 - Content directory owned by `anthony` (no root needed for deploys)
 
 ### Deployment
-- `deploy/deploy-pages.sh` — rsync pages to monkeys (no root needed)
+- `deploy/deploy-pages.sh` — rsync pages to monkeys (no root needed, excludes rsvp-data)
 - `deploy/deploy-apache-config.sh` — installs Apache config (needs `sumo`, local terminal only)
 - Manual Apache config deploy from SSH: copy to `/tmp/ordiwedding.tmp` then `sudo cp` + `sudo apache2ctl graceful`
 
@@ -72,7 +73,9 @@ Located in `apache-config/ordiwedding`. Key features:
 - `/-/our-story` — How they met, narrative, photo placeholders, YouTube embeds
 - `/-/gifts` — Julie's gift wish list, maker listings (written in Julie's voice)
 - `/-/travel` — Transport advice, accommodation listings by area
-- `/-/rsvp` — Placeholder: email Julie to RSVP
+- `/-/rsvp` — RSVP form (POST to `/-/cgi/rsvp-submit.pl`)
+- `/-/cgi/rsvp-submit.pl` — Perl CGI: validates, saves to rsvp-data, archives on resubmit
+- `/-/rsvp-data/` — Submitted RSVPs (one file per response, e.g. `yes-2-name+guest.txt`)
 - Shared nav via SSI include (`nav.html`)
 - Shared stylesheet (`style.css`) — sage green, cream, serif fonts
 
@@ -106,22 +109,26 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 ### Completed
 - Both domains active and routing correctly via Cloudflare
 - Cloudflare Workers routing `/-*` to monkeys, everything else to Canva
-- Apache config with SSI and MultiViews
+- Apache config with SSI, MultiViews, and CGI
 - Content pages live: our-story, gifts, travel, rsvp
+- RSVP form with Perl CGI backend (file-per-response, archive on resubmit)
 - Shared nav via SSI include
 - Extensionless URLs working
 - Canva homepage links to all content pages
-- Deploy pipeline working (rsync, no root needed)
+- Deploy pipeline working (rsync, no root needed, excludes rsvp-data)
 
 ### Content Notes
 - Our Story has photo placeholders — awaiting images from Julie
 - Julie's "neurotypical" typo corrected to "neurodivergent" (check with Julie)
 - References to other partners removed from Our Story for sensitivity
 - Anthony's Pulp fan page linked via Wayback Machine
+- "Taking on the World" video added as first of three My Life Story videos
+- Moth Embroidery Shop removed from gifts (maker on hiatus)
+- rsvp-data directory: owned by anthony, group www-data, mode 775
 
 ### Outstanding / Future
 - Photos from Julie for Our Story page
-- RSVP form (Perl CGI — server has Perl and CGI enabled)
+- RSVP summary view (HTML table with totals, or Google Sheets export)
 - "I've booked here" form on travel page (accommodation coordination)
 - Guest contribution features (travel tips, guestbook) — same form→file pattern
 - Custom 404 page

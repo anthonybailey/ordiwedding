@@ -12,7 +12,7 @@ echo "=== Deploying pages to monkeys ==="
 
 # Copy page files directly (anthony owns the target directory)
 echo "1. Syncing page files..."
-rsync -av --delete pages/ monkeys:/var/www/ordiwedding/-/
+rsync -av --delete --exclude rsvp-data pages/ monkeys:/var/www/ordiwedding/-/
 
 echo ""
 echo "=== Pages deployment complete! ==="
