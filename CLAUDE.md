@@ -40,6 +40,7 @@ SSL is terminated by Cloudflare (Flexible mode — connects to monkeys via HTTP)
 - **OS:** Ubuntu 8.04 (ancient but functional)
 - **Apache:** 2.2.8 with mod_include (SSI) and MultiViews enabled
 - **Perl:** 5.8.8, CGI module 3.15 (used for RSVP form)
+- **Postfix:** Configured as Gmail SMTP relay (sends as anthony.bailey@gmail.com)
 - **PHP:** Not installed
 - **Python:** 2.5.2 only
 - **SSH:** Only offers ssh-rsa/ssh-dss (modern clients need `HostKeyAlgorithms +ssh-rsa`)
@@ -111,7 +112,10 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - Cloudflare Workers routing `/-*` to monkeys, everything else to Canva
 - Apache config with SSI, MultiViews, and CGI
 - Content pages live: our-story, gifts, travel, rsvp
-- RSVP form with Perl CGI backend (file-per-response, archive on resubmit)
+- RSVP form with Perl CGI backend (file-per-response, archive on resubmit, email notifications)
+- RSVP asks about both venues (Cwm Weeg wedding + Andrew Logan Museum morning)
+- Email notifications to Anthony & Julie on each RSVP (via Gmail SMTP relay on monkeys)
+- RSVP responses viewer page at `/-/rsvp-responses` (unlisted, iframes directory listing)
 - Shared nav via SSI include
 - Extensionless URLs working
 - Canva homepage links to all content pages
@@ -125,6 +129,8 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - "Taking on the World" video added as first of three My Life Story videos
 - Moth Embroidery Shop removed from gifts (maker on hiatus)
 - rsvp-data directory: owned by anthony, group www-data, mode 775
+- Postfix on monkeys configured as Gmail SMTP relay (app password for anthony.bailey@gmail.com)
+- `deploy/setup-mail-relay.sh` — one-time setup script (takes app password as argument, needs sudo)
 
 ### Outstanding / Future
 - Photos from Julie for Our Story page

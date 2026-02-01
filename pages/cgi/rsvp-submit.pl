@@ -37,6 +37,78 @@ sub sanitize_for_filename {
     return $str;
 }
 
+sub tally_rsvps {
+    my %tally = (
+        yes => 0, no => 0, maybe => 0,
+        yes_guests => 0, maybe_guests => 0,
+        museum_yes => 0, museum_maybe => 0,
+    );
+    if (opendir my $dh, $DATA_DIR) {
+        while (my $entry = readdir $dh) {
+            next unless $entry =~ /\.txt$/;
+            next if $entry =~ /^\d{8}-\d{6}\./;  # skip archived
+            my ($att, $num, $mus) = ('', 0, '');
+            if (open my $fh, '<', "$DATA_DIR/$entry") {
+                while (my $line = <$fh>) {
+                    $att = $1 if $line =~ /^Attending:\s*(\S+)/;
+                    $num = $1 if $line =~ /^Number:\s*(\d+)/;
+                    $mus = $1 if $line =~ /^Museum:\s*(\S+)/;
+                }
+                close $fh;
+            }
+            if ($att eq 'yes') {
+                $tally{yes}++;
+                $tally{yes_guests} += ($num || 1);
+                $tally{museum_yes}   += ($num || 1) if $mus eq 'yes';
+                $tally{museum_maybe} += ($num || 1) if $mus eq 'maybe';
+            } elsif ($att eq 'no') {
+                $tally{no}++;
+            } elsif ($att eq 'maybe') {
+                $tally{maybe}++;
+                $tally{maybe_guests} += ($num || 1);
+                $tally{museum_yes}   += ($num || 1) if $mus eq 'yes';
+                $tally{museum_maybe} += ($num || 1) if $mus eq 'maybe';
+            }
+        }
+        closedir $dh;
+    }
+    return %tally;
+}
+
+sub send_notification {
+    my ($submission, $is_update, %tally) = @_;
+    my $update_label = $is_update ? ' update' : '';
+    my $att_label = $submission->{attending} eq 'yes' ? 'Yes'
+                  : $submission->{attending} eq 'no'  ? 'No'
+                  : 'Maybe';
+    my $num_label = $submission->{attending} eq 'no' ? '' : " ($submission->{number})";
+
+    my $total_guests = $tally{yes_guests} + $tally{maybe_guests};
+    my $subject = "RSVP$update_label: $submission->{name} - $att_label$num_label";
+
+    my $body = "New RSVP$update_label submitted:\n\n";
+    $body .= $submission->{content};
+    $body .= "\n--- Current totals ---\n";
+    $body .= "Yes: $tally{yes} ($tally{yes_guests} guests)\n";
+    $body .= "Maybe: $tally{maybe} ($tally{maybe_guests} guests)\n";
+    $body .= "No: $tally{no}\n";
+    $body .= "Total expected guests: $total_guests\n";
+    $body .= "\n--- Museum (Andrew Logan) ---\n";
+    $body .= "Yes: $tally{museum_yes} guests\n";
+    $body .= "Maybe: $tally{museum_maybe} guests\n";
+    $body .= "\nView all responses: https://ordiwedd.ing/-/rsvp-responses\n";
+
+    eval {
+        open(my $mh, '|-', '/usr/sbin/sendmail', '-t') or return;
+        print $mh "To: mail\@anthonybailey.net, julie.dawson\@gmail.com\n";
+        print $mh "Subject: $subject\n";
+        print $mh "Content-Type: text/plain; charset=utf-8\n";
+        print $mh "\n";
+        print $mh $body;
+        close $mh;
+    };
+}
+
 sub read_nav {
     my $html = '';
     if (open my $fh, '<', $NAV_FILE) {
@@ -80,6 +152,7 @@ my $attending  = sanitize($q->param('attending') || '', 20);
 my $number    = int($q->param('number') || 1);
 my $guests    = sanitize($q->param('guests')    || '', 500);
 my $dietary   = sanitize($q->param('dietary')   || '', 2000);
+my $museum    = sanitize($q->param('museum')    || '', 20);
 my $message   = sanitize($q->param('message')   || '', 2000);
 
 $number = 1  if $number < 1;
@@ -174,6 +247,7 @@ $content   .= "Attending: $attending\n";
 if ($attending ne 'no') {
     $content .= "Number: $number\n";
     $content .= "Additional guests: $guests\n" if $guests;
+    $content .= "Museum: $museum\n"            if $museum =~ /^(yes|no|maybe)$/;
     $content .= "Dietary: $dietary\n"          if $dietary;
 }
 $content .= "Message: $message\n" if $message;
@@ -191,6 +265,16 @@ flock($fh, LOCK_EX);
 print $fh $content;
 close $fh;
 
+# --- Email notification ---
+
+my %tally = tally_rsvps();
+send_notification({
+    name      => $name,
+    attending => $attending,
+    number    => $number,
+    content   => $content,
+}, scalar(@to_archive), %tally);
+
 # --- Thank-you page ---
 
 my $esc_name    = escape_html($name);
@@ -206,10 +290,13 @@ my $updated = @to_archive
 my $summary = "<p><strong>Name:</strong> $esc_name</p>\n";
 $summary   .= "<p><strong>Contact:</strong> $esc_contact</p>\n";
 
+my $museum_label = $museum eq 'yes' ? 'Yes' : $museum eq 'no' ? 'No' : $museum eq 'maybe' ? 'Not sure yet' : '';
+
 if ($attending eq 'yes') {
     $summary .= "<p><strong>Attending:</strong> Yes</p>\n";
     $summary .= "<p><strong>Party size:</strong> $number</p>\n";
     $summary .= "<p><strong>Additional guests:</strong> $esc_guests</p>\n" if $guests;
+    $summary .= "<p><strong>Museum in the morning:</strong> $museum_label</p>\n" if $museum_label;
     $summary .= "<p><strong>Dietary:</strong> $esc_dietary</p>\n"          if $dietary;
 } elsif ($attending eq 'no') {
     $summary .= "<p><strong>Attending:</strong> No</p>\n";
@@ -217,6 +304,7 @@ if ($attending eq 'yes') {
     $summary .= "<p><strong>Attending:</strong> Not sure yet</p>\n";
     $summary .= "<p><strong>Party size:</strong> $number</p>\n";
     $summary .= "<p><strong>Additional guests:</strong> $esc_guests</p>\n" if $guests;
+    $summary .= "<p><strong>Museum in the morning:</strong> $museum_label</p>\n" if $museum_label;
     $summary .= "<p><strong>Dietary:</strong> $esc_dietary</p>\n"          if $dietary;
 }
 $summary .= "<p><strong>Message:</strong> $esc_message</p>\n" if $message;
