@@ -105,7 +105,7 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - Julie Dawson: 07951 137 218, julie.dawson@gmail.com
 - Julie is primary contact for RSVP and guest queries
 
-## Implementation Status (February 1, 2026)
+## Implementation Status (February 2, 2026)
 
 ### Completed
 - Both domains active and routing correctly via Cloudflare
@@ -120,20 +120,20 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - Extensionless URLs working
 - Canva homepage links to all content pages
 - Deploy pipeline working (rsync, no root needed, excludes rsvp-data)
+- Our Story photos added: 9 images with resized thumbnails and full-size click-through
+- Photo layout: full-width, inset float, and side-by-side pairs with responsive CSS
 
 ### Content Notes
-- Our Story has photo placeholders — awaiting images from Julie
 - Julie's "neurotypical" typo corrected to "neurodivergent" (check with Julie)
 - References to other partners removed from Our Story for sensitivity
 - Anthony's Pulp fan page linked via Wayback Machine
-- "Taking on the World" video added as first of three My Life Story videos
+- "Taking on the World" video added as first of two My Life Story videos
 - Moth Embroidery Shop removed from gifts (maker on hiatus)
 - rsvp-data directory: owned by anthony, group www-data, mode 775
 - Postfix on monkeys configured as Gmail SMTP relay (app password for anthony.bailey@gmail.com)
 - `deploy/setup-mail-relay.sh` — one-time setup script (takes app password as argument, needs sudo)
 
 ### Outstanding / Future
-- Photos from Julie for Our Story page
 - RSVP summary view (HTML table with totals, or Google Sheets export)
 - "I've booked here" form on travel page (accommodation coordination)
 - Guest contribution features (travel tips, guestbook) — same form→file pattern
