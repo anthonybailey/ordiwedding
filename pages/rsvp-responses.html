@@ -3,9 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RSVP Responses - Julie & Anthony</title>
+    <title>Admin - Julie & Anthony</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        .sheet-link {
+            display: inline-block;
+            margin: 1em 0;
+            padding: 0.75em 1.25em;
+            background: #8B9F8C;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .sheet-link:hover { background: #6f8472; }
         iframe {
             width: 100%;
             min-height: 400px;
@@ -13,6 +24,8 @@
             background: #fff;
             margin: 1em 0;
         }
+        details { margin-top: 2em; }
+        details summary { cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -20,21 +33,32 @@
         <!--#include file="nav.html" -->
     </nav>
 
-    <h1>RSVP Responses</h1>
+    <h1>Admin</h1>
 
-    <p>Click any file to read the full response.</p>
+    <p>The canonical guest list lives in a Google Sheet that Julie and Anthony
+    edit manually. The website RSVP form still works as a passive catcher for
+    any guests who do use it &mdash; check the raw responses below from time
+    to time and copy any new info into the Sheet.</p>
 
-    <h2>How to read the filenames</h2>
-    <ul>
-        <li><strong>yes-2-jane_smith+john_smith.txt</strong> &mdash; Jane said yes, party of 2 (with John)</li>
-        <li><strong>no-0-bob_jones.txt</strong> &mdash; Bob said no</li>
-        <li><strong>maybe-1-sue_lee.txt</strong> &mdash; Sue isn't sure yet, party of 1</li>
-    </ul>
+    <p>
+        <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/17m0ObIk25F6ZxWBf8EniLGYmnz0Pjb69/edit">
+            Open the guest list Sheet &rarr;
+        </a>
+    </p>
 
-    <p>Files starting with a date like <strong>20260215-143022.</strong> are old versions &mdash;
-    that guest submitted an updated RSVP and the previous one was archived.</p>
+    <details>
+        <summary>Raw form responses (passive collector)</summary>
 
-    <iframe src="/-/rsvp-data/"></iframe>
+        <p>Click any file to read the full response.</p>
+
+        <p><strong>Filenames:</strong>
+        <code>yes-2-jane_smith+john_smith.txt</code> means Jane said yes, party of 2 (with John).
+        <code>no-0-bob_jones.txt</code> means Bob said no.
+        Files starting with a date like <code>20260215-143022.</code> are old versions
+        &mdash; that guest submitted an updated RSVP and the previous one was archived.</p>
+
+        <iframe src="/-/rsvp-data/"></iframe>
+    </details>
 
     <footer>
         <p>This page is not linked from the main site &mdash; just for us.</p>
