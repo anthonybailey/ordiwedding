@@ -105,9 +105,13 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - Julie Dawson: 07951 137 218, julie.dawson@gmail.com
 - Julie is primary contact for RSVP and guest queries
 
-## Implementation Status (February 2, 2026)
+## Implementation Status (April 7, 2026)
 
 ### Completed
+- **Site is live and being used by guests**
+- Guest list management migrated to a Google Sheet (canonical source) — Anthony and Julie edit manually; the website RSVP form remains as a passive catcher for guests who use it
+- Admin page (`/-/rsvp-responses`) refocused: link to the Sheet at top, raw form responses demoted under a collapsed `<details>` element
+- `tools/build-guest-list-xlsx.py` — one-time XLSX bootstrap script that merged form responses, Julie's email-tracked guests, and her working CSV (depends on `python3-openpyxl`; dormant after initial import)
 - Both domains active and routing correctly via Cloudflare
 - Cloudflare Workers routing `/-*` to monkeys, everything else to Canva
 - Apache config with SSI, MultiViews, and CGI
@@ -134,13 +138,11 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - `deploy/setup-mail-relay.sh` — one-time setup script (takes app password as argument, needs sudo)
 
 ### Outstanding / Future
-- RSVP summary view (HTML table with totals, or Google Sheets export)
 - "I've booked here" form on travel page (accommodation coordination)
 - Guest contribution features (travel tips, guestbook) — same form→file pattern
 - Custom 404 page
 - Open Graph meta tags for social sharing
 - Mobile testing
-- Soft launch with trusted guests
 
 ### Tools
 - `sumo` — Remote sudo wrapper for monkeys (in ~/repos/main/bin/, SVN)
@@ -150,6 +152,6 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 ---
 
 *Document created: August 2025*
-*Last updated: February 2026*
+*Last updated: April 2026*
 *Wedding date: May 23, 2026*
 *Venues: Andrew Logan Museum of Sculpture & Cwm Weeg Gardens, Wales*
