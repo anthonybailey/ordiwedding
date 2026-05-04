@@ -15,7 +15,7 @@ Unified wedding website for Anthony Bailey & Julie Dawson's wedding on May 23, 2
 
 **Domains:**
 - ordiwedd.ing (primary, HTTPS via Cloudflare)
-- ordi.wedding (also works)
+- ordi.wedding — 301-redirects to ordiwedd.ing via a Cloudflare Redirect Rule on the ordi.wedding zone. Scheduled to expire 2026-05-28 (not being renewed).
 
 **Design references:**
 - Canva site URL: https://ordiwedding-preview.my.canva.site/
@@ -27,11 +27,12 @@ Unified wedding website for Anthony Bailey & Julie Dawson's wedding on May 23, 2
 
 ### Routing
 ```
-ordiwedd.ing/          → Cloudflare Worker → Canva homepage
-ordiwedd.ing/-/*       → Cloudflare Worker → monkeys VPS
+ordiwedd.ing/          → Cloudflare Worker (ordiwedding-proxy) → Canva homepage
+ordiwedd.ing/-/*       → Cloudflare proxy → monkeys VPS (worker disabled on this path)
+ordi.wedding/*         → Cloudflare Redirect Rule → 301 to ordiwedd.ing/<same-path>
 ```
 
-Cloudflare Worker matches `/-*` (full glob — no single-character matching available). The `/-/` prefix is an unobtrusive URL convention.
+Worker triggers on ordiwedd.ing: `*ordiwedd.ing/*` runs the worker; `*ordiwedd.ing/-*` disables it (more-specific route wins). The `/-/` prefix is an unobtrusive URL convention.
 
 SSL is terminated by Cloudflare (Flexible mode — connects to monkeys via HTTP).
 
@@ -112,8 +113,8 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 - Guest list management migrated to a Google Sheet (canonical source) — Anthony and Julie edit manually; the website RSVP form remains as a passive catcher for guests who use it
 - Admin page (`/-/rsvp-responses`) refocused: link to the Sheet at top, raw form responses demoted under a collapsed `<details>` element
 - `tools/build-guest-list-xlsx.py` — one-time XLSX bootstrap script that merged form responses, Julie's email-tracked guests, and her working CSV (depends on `python3-openpyxl`; dormant after initial import)
-- Both domains active and routing correctly via Cloudflare
-- Cloudflare Workers routing `/-*` to monkeys, everything else to Canva
+- ordiwedd.ing is the primary domain; ordi.wedding 301-redirects to it (Cloudflare Redirect Rule, set up 2026-05-04). ordi.wedding will expire 2026-05-28 and is not being renewed.
+- Cloudflare Workers routing: worker serves Canva at the root, monkeys serves `/-/*` (worker disabled on that path)
 - Apache config with SSI, MultiViews, and CGI
 - Content pages live: our-story, gifts, travel, rsvp
 - RSVP form with Perl CGI backend (file-per-response, archive on resubmit, email notifications)
@@ -152,6 +153,6 @@ Links must be absolute URLs in Canva (relative URLs resolve to canva.site).
 ---
 
 *Document created: August 2025*
-*Last updated: April 2026*
+*Last updated: May 2026*
 *Wedding date: May 23, 2026*
 *Venues: Andrew Logan Museum of Sculpture & Cwm Weeg Gardens, Wales*
